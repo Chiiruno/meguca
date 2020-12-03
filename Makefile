@@ -1,5 +1,7 @@
 .PHONY: server client imager test websockets
 
+# TODO: patch this
+
 all: server client css websockets
 
 client:
@@ -30,9 +32,6 @@ ifneq ($(NO_DEPS),1)
 	npm install --progress false --depth 0
 endif
 	$(MAKE) -C less
-
-generate:
-	go generate ./...
 
 websockets:
 # Generate a hash and add it to LDFLAGS of the binary to force a rebuild on the

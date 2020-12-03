@@ -4,11 +4,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/bakape/meguca/websockets"
-
-	"github.com/bakape/meguca/config"
-	"github.com/bakape/meguca/db"
 	"github.com/bakape/meguca/imager/assets"
+	"github.com/bakape/meguca/imager/db"
 )
 
 func TestMain(m *testing.M) {
@@ -31,10 +28,6 @@ func TestMain(m *testing.M) {
 			},
 		})
 		err = assets.CreateDirs()
-		if err != nil {
-			return
-		}
-		err = websockets.Init()
 		if err != nil {
 			return
 		}

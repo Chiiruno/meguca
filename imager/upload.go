@@ -16,18 +16,15 @@ import (
 	"image/jpeg"
 	"io"
 	"mime/multipart"
-	"net"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 	"unicode/utf8"
 
-	"github.com/bakape/meguca/auth"
-	"github.com/bakape/meguca/common"
-	"github.com/bakape/meguca/config"
-	"github.com/bakape/meguca/db"
-	"github.com/bakape/meguca/websockets"
+	"github.com/bakape/meguca/imager/common"
+	"github.com/bakape/meguca/imager/config"
+	"github.com/bakape/meguca/imager/db"
 	"github.com/bakape/thumbnailer/v2"
 	"github.com/chai2010/webp"
 	"github.com/go-playground/log"
@@ -59,7 +56,7 @@ var (
 		"application/vnd.comicbook-rar": common.CBR,
 	}
 
-	pubKeyCache = common.NewCacheMap()
+	pubKeyCache = newCacheMap()
 
 	// MIME types from thumbnailer to accept
 	allowedMimeTypes map[string]bool
@@ -377,16 +374,18 @@ func insertImage(tx pgx.Tx, req insertionRequest, img common.ImageCommon,
 	)
 	switch err {
 	case nil:
-		return websockets.InsertImage(
-			thread,
-			req.post,
-			req.pubKey,
-			common.Image{
-				ImageCommon: img,
-				Spoilered:   req.spoiler,
-				Name:        req.name,
-			},
-		)
+		// TODO: write to notified DB queue instead
+		panic("TODO")
+		// return websockets.InsertImage(
+		// 	thread,
+		// 	req.post,
+		// 	req.pubKey,
+		// 	common.Image{
+		// 		ImageCommon: img,
+		// 		Spoilered:   req.spoiler,
+		// 		Name:        req.name,
+		// 	},
+		// )
 	case pgx.ErrNoRows:
 		return errNoCandidatePost
 	default:
@@ -410,11 +409,7 @@ func handleError(w http.ResponseWriter, r *http.Request, f func() error) {
 	if common.IsTest || common.CanIgnoreClientError(err) {
 		return
 	}
-	ip, ipErr := auth.GetIP(r)
-	if ipErr != nil {
-		ip = net.IPv4zero
-	}
-	log.Errorf("upload error: by %s: %s: %#v", ip, err, err)
+	log.Errorf("upload error:  %s: %#v", err, err)
 }
 
 // Create a new thumbnail, commit its resources to the DB and filesystem,
